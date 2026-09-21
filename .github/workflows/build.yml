@@ -1,1 +1,37 @@
+name: Build Web3Crawler DLL
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Build DLL
+        shell: cmd
+        run: |
+          cl /LD /EHsc Web3Crawler.cpp winhttp.lib /Fe:Web3Crawler.dll
+
+      - name: Show exported functions
+        shell: cmd
+        run: |
+          dumpbin /exports Web3Crawler.dll
+
+      - name: Upload DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Web3Crawler-x86
+          path: Web3Crawler.dll
